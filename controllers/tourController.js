@@ -3,10 +3,30 @@ const Tour = require('./../models/tourModels');
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // );
-
 exports.getAllTours = async (req, res) => {
   try {
-    const allTours = await Tour.find();
+    const queryObj = { ...req.query };
+    const excludeFields = ['page', 'sort', 'limit', 'fields'];
+    excludeFields.forEach(el => delete queryObj[el]);
+
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|lte|lt|gt)\b/g, match => `$${match}`);
+
+    let query = Tour.find(JSON.parse(queryStr));
+
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      // console.log(sortBy);
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+    // const query =  Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy');
+    const allTours = await query;
     res.status(200).json({
       status: 'success',
       results: allTours.length,
