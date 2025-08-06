@@ -5,7 +5,7 @@ const Tour = require('./../../models/tourModels');
 
 dotenv.config({ path: './config.env' });
 const DB = process.env.DATABASE.replace(
-  '<db_password>',
+  '<DB_PASSWORD>',
   process.env.DB_PASSWORD
 );
 
